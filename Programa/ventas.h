@@ -13,7 +13,6 @@
  **************************************************/
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "funcs_json.h"
 
@@ -578,8 +577,5 @@ void totalVentasAnuales(listaVentas *lista, char ***años_totales, float **total
         (*totales_anuales)[año_existente] += total;
     }
 }
-
-
-
 
 #endif //VENTAS_H
