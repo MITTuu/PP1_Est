@@ -247,4 +247,198 @@ void importarDatos(listaVentas *lista, const char *path) {
     printf("\nDatos importados correctamente.\n");
 }
 
+/*****Nombre***************************************
+ * Función calcularModa
+ *****Descripción**********************************
+ * Calcula la moda para una lista de enteros.
+ *****Retorno**************************************
+ * @return: La moda de los enteros dados.
+ ****Entradas************************************** 
+ * @param valores: Un arreglo de enteros.
+ * @param size: El tamaño del arreglo.
+ **************************************************/
+int calcularModa(int *valores, size_t size) {
+    if (size == 0) return 0;
+
+    int max_count, moda = valores[0];
+    for (size_t i = 0; i < size; i++) {
+        int count = 0;
+        for (size_t i = 0; j < size; j++) {
+            if (valores[i] == valores[j]) {
+                count++;
+            }
+        }
+        if (count > max_count) {
+            max_count = count;
+            moda = valores[i];
+        }
+    }
+    return moda;
+}
+
+/*****Nombre***************************************
+ * Función calcularMedia
+ *****Descripción**********************************
+ * Calcula la media para una lista de flotantes.
+ *****Retorno**************************************
+ * @return: La media de los flotantes dados.
+ ****Entradas************************************** 
+ * @param valores: Un arreglo de flotantes.
+ * @param size: El tamaño del arreglo.
+ **************************************************/
+float calcularMedia(float *valores, size_t size) {
+    if (size == 0) return 0.0f;
+
+    float suma = 0.0f;
+    for (size_t i = 0; i < size; i++) {
+        suma += valores[i];
+    }
+    return suma / size;
+}
+
+/*****Nombre***************************************
+ * Función calcularMediana
+ *****Descripción**********************************
+ * Calcula la mediana para una lista de flotantes.
+ *****Retorno**************************************
+ * @return: La mediana de los flotantes dados.
+ ****Entradas************************************** 
+ * @param valores: Un arreglo de flotantes.
+ * @param size: El tamaño del arreglo.
+ **************************************************/
+float calcularMediana(float *valores, size_t size) {
+    if (size == 0) return 0.0f;
+
+    for (size_t i = 0; i < size - 1; i++) {
+        for (size_t j = i + 1; j < size; j++) {
+            if (valores[i] > valores[j]) {
+                float temp = valores[i];
+                valores[i] = valores[j];
+                valores[j] = temp;
+            }
+        }
+    }
+    if (size % 2 == 0) {
+        return (valores[size / 2 - 1] + valores[size / 2]) / 2.0f;
+    } else {
+        return valores[size / 2];
+    }
+}
+
+/*****Nombre***************************************
+ * Función completarDatosFaltantes
+ *****Descripción**********************************
+ * Completa los datos faltantes en la lista de ventas utilizando moda, media o mediana.
+ *****Retorno**************************************
+ * 
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` 
+ *                que contiene las ventas a procesar.
+ **************************************************/
+void completarDatos(listaVentas *lista) {
+    int *cantidades = (int *)malloc(sizeof(int) * lista->size);
+    float *precios = (float *)malloc(sizeof(float) * lista->size);
+    size_t cantidadCount = 0;
+    size_t precioCount = 0;
+
+    // Tomar totales de cantidades y precios
+    for (size_t i = 0; i < lista->size; i++) {
+        if (lista->ventas[i].cantidad > 0) {
+            cantidades[cantidadCount++] = lista->ventas[i].cantidad;
+        }
+        if (lista->ventas[i].precio_unitario > 0) {
+            precios[precioCount++] = lista->ventas[i].precio_unitario;
+        }
+    }
+
+    // Completar datos faltantes
+    for (size_t i = 0; i < lista->size; i++) { 
+        if (lista->ventas[i].cantidad <= 0) {
+            int modaCantidad = calcularModa(cantidades, cantidadCount);
+            lista->ventas[i].cantidad = modaCantidad;
+            printf("Registro %d: cantidad reemplazada por moda %d\n", lista->ventas[i].venta_id, modaCantidad);
+        }
+
+        if (lista->ventas[i].precio_unitario <= 0) {
+            char opcion;
+            printf("\nRegistro %d: Precio unitario faltante. Seleccione el método de imputación:\n", lista->ventas[i].venta_id);
+            printf("  1. Media\n");
+            printf("  2. Mediana\n");
+            printf("  Seleccione una opción: ");
+            scanf(" %c", &opcion);
+
+            float valor_imputado = 0.0f;
+            switch (opcion) {
+                case '1':
+                    valor_imputado = calcularMedia(precios, precioCount);
+                    printf("Registro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    break;
+                case '2':
+                    valor_imputado = calcularMediana(precios, precioCount);
+                    printf("Registro %d: precio unitario reemplazado por mediana %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    break;
+                default:
+                    printf("Opción inválida. Usando media por defecto.\n");
+                    valor_imputado = calcularMedia(precios, precioCount);
+                    printf("Registro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    break;
+            }
+            lista->ventas[i].precio_unitario = valor_imputado;
+        }
+    }
+    free(cantidades);
+    free(precios);
+}
+
+
+/*****Nombre***************************************
+ * Función eliminarDatosDuplicados
+ *****Descripción**********************************
+ * Elimina las ventas duplicadas basándose en el identificador de venta.
+ *****Retorno**************************************
+ * 
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` 
+ *                que contiene las ventas a procesar.
+ **************************************************/
+void eliminarDatosDuplicados(listaVentas *lista) {
+    // Usar un arreglo para marcar si un ID de venta ya ha sido visto
+    int *ids_vistos = (int *)malloc(sizeof(int) * lista->size);
+    size_t count_ids = 0;
+    size_t i = 0;
+
+    while (i < lista->size) {
+        int id_actual = lista->ventas[i].venta_id;
+        int duplicado = 0;
+
+        for (size_t j = 0; j < count_ids; j++) {
+            if (ids_vistos[j] == id_actual) {
+                duplicado = 1;
+                break;
+            }
+        }
+
+        if (duplicado) {
+            printf("Se eliminó el registro duplicado con venta ID %d\n", id_actual);
+            // Desplazar todos los elementos hacia la izquierda
+            for (size_t k = i; k < lista->size - 1; k++) {
+                lista->ventas[k] = lista->ventas[k + 1];
+            }
+            lista->size--;
+        } else {
+            ids_vistos[count_ids++] = id_actual;
+            i++;
+        }
+    }
+
+    free(ids_vistos);
+}
+
+
+
+
+
+
+
+
 #endif //VENTAS_H

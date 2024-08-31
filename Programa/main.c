@@ -54,7 +54,8 @@ int main() {
             break;
 
         case '2':
-            printf("Opción 2\n");
+            eliminarDatosDuplicados(lista);
+            completarDatosFaltantes(lista);
             break;
 
         case '3':
