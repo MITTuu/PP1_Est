@@ -13,6 +13,7 @@
  **************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "funcs_json.h"
 
@@ -80,19 +81,21 @@ listaVentas* crearListaVentas() {
     // Asignar memoria para el struct listaVentas
     listaVentas *lista = (listaVentas *)malloc(sizeof(listaVentas));
     if (lista == NULL) {
+        printf("Error al asignar memoria para la lista de ventas.\n");
         return NULL;
     }
     
-    // Asignar memoria para el struct Venta
-    lista->ventas = (Venta *)malloc(sizeof(Venta) *10);
+    // Asignar memoria para un array de structs Venta de tamaño inicial 10
+    lista->ventas = (Venta *)malloc(sizeof(Venta) * 10);
     if (lista->ventas == NULL) {
+        printf("Error al asignar memoria para las ventas.\n");
         free(lista);
         return NULL;
-    }  
+    }
     
     // Inicializar campos del struct listaVentas
-    lista->size = 0;
-    lista->capacity = 10;
+    lista->size = 0;       
+    lista->capacity = 10;  
 
     return lista;
 }
@@ -109,13 +112,29 @@ listaVentas* crearListaVentas() {
  * @param lista: Un puntero al struct `listaVentas`.
  * @param venta: Un struct `Venta`.
  **************************************************/
-void agregarVenta(listaVentas *lista, Venta venta) {
-    if (lista->size == lista->capacity) {
-        lista->capacity *= 2;
-        lista->ventas = (Venta *)realloc(lista->ventas, sizeof(Venta) * lista->capacity);
+void agregarVenta(listaVentas *lista, Venta nuevaVenta) {
+    if (lista == NULL) {
+        printf("Error: La lista de ventas no está inicializada.\n");
+        return;
     }
-    lista->ventas[lista->size++] = venta;
+    
+    // Verificar si hay suficiente capacidad; si no, redimensionar el array
+    if (lista->size >= lista->capacity) {
+        // Duplicar la capacidad actual
+        lista->capacity *= 2;
+        Venta *temp = (Venta *)realloc(lista->ventas, sizeof(Venta) * lista->capacity);
+        if (temp == NULL) {
+            printf("Error al redimensionar la memoria para las ventas.\n");
+            return;
+        }
+        lista->ventas = temp;
+    }
+    
+    // Agregar la nueva venta
+    lista->ventas[lista->size] = nuevaVenta;
+    lista->size++;
 }
+
 
 /*****Nombre***************************************
  * Función liberarListaVentas
@@ -132,30 +151,12 @@ void agregarVenta(listaVentas *lista, Venta venta) {
  **************************************************/
 void liberarListaVentas(listaVentas *lista) {
     if (lista != NULL) {
-        for (size_t i = 0; i < lista->size; i++) {
-            free(lista->ventas[i].fecha);
-            free(lista->ventas[i].producto_nombre);
-            free(lista->ventas[i].categoria);
-        }
-        free(lista->ventas);
-        free(lista);
+        free(lista->ventas); 
+        free(lista);         
     }
 }
 
-/*****Nombre***************************************
- * Función reportarAtributosFaltantes
- *****Descripción**********************************
- * Esta función verifica los atributos requeridos en un objeto JSON
- * que representa una venta. 
- *****Retorno**************************************
- * 
- ****Entradas**************************************
- * @param item: Un puntero al objeto `cJSON` que representa una venta 
- *               y contiene los atributos a verificar.
- * @param linea: El número de línea en el archivo JSON donde se 
- *                encuentra el objeto `item`, usado para el mensaje 
- *                de error si faltan atributos.
- **************************************************/
+// Función para construir el mensaje de error sobre atributos faltantes
 void reportarAtributosFaltantes(cJSON *item, int linea) {
     const char *atributos[] = { "venta_id", "fecha", "producto_id", "producto_nombre", "categoria" };
     const char *nombre_atributos[] = { "Identificador de venta", "Fecha", "Identificador de producto", "Nombre de producto", "Categoría" };
@@ -174,12 +175,14 @@ void reportarAtributosFaltantes(cJSON *item, int linea) {
     }
 
     if (faltan == 0) {
+        // Si no faltan atributos (esto no debería pasar con esta función), eliminar el mensaje
         mensaje[0] = '\0';
     } else {
         strncat(mensaje, ".", sizeof(mensaje) - strlen(mensaje));
         printf("%s\n", mensaje);
     }
 }
+
 
 /*****Nombre***************************************
  * Función importarDatos
@@ -263,7 +266,7 @@ int calcularModa(int *valores, size_t size) {
     int max_count, moda = valores[0];
     for (size_t i = 0; i < size; i++) {
         int count = 0;
-        for (size_t i = 0; j < size; j++) {
+        for (size_t j = 0; j < size; j++) {
             if (valores[i] == valores[j]) {
                 count++;
             }
@@ -356,7 +359,7 @@ void completarDatos(listaVentas *lista) {
         if (lista->ventas[i].cantidad <= 0) {
             int modaCantidad = calcularModa(cantidades, cantidadCount);
             lista->ventas[i].cantidad = modaCantidad;
-            printf("Registro %d: cantidad reemplazada por moda %d\n", lista->ventas[i].venta_id, modaCantidad);
+            printf("\nRegistro %d: cantidad reemplazada por moda %d\n", lista->ventas[i].venta_id, modaCantidad);
         }
 
         if (lista->ventas[i].precio_unitario <= 0) {
@@ -371,16 +374,16 @@ void completarDatos(listaVentas *lista) {
             switch (opcion) {
                 case '1':
                     valor_imputado = calcularMedia(precios, precioCount);
-                    printf("Registro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    printf("\nRegistro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
                     break;
                 case '2':
                     valor_imputado = calcularMediana(precios, precioCount);
-                    printf("Registro %d: precio unitario reemplazado por mediana %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    printf("\nRegistro %d: precio unitario reemplazado por mediana %.2f\n", lista->ventas[i].venta_id, valor_imputado);
                     break;
                 default:
-                    printf("Opción inválida. Usando media por defecto.\n");
+                    printf("\nOpción inválida. Usando media por defecto.\n");
                     valor_imputado = calcularMedia(precios, precioCount);
-                    printf("Registro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
+                    printf("\nRegistro %d: precio unitario reemplazado por media %.2f\n", lista->ventas[i].venta_id, valor_imputado);
                     break;
             }
             lista->ventas[i].precio_unitario = valor_imputado;
@@ -389,7 +392,6 @@ void completarDatos(listaVentas *lista) {
     free(cantidades);
     free(precios);
 }
-
 
 /*****Nombre***************************************
  * Función eliminarDatosDuplicados
@@ -406,7 +408,9 @@ void eliminarDatosDuplicados(listaVentas *lista) {
     int *ids_vistos = (int *)malloc(sizeof(int) * lista->size);
     size_t count_ids = 0;
     size_t i = 0;
-
+    
+    printf("\n");
+    
     while (i < lista->size) {
         int id_actual = lista->ventas[i].venta_id;
         int duplicado = 0;
@@ -434,9 +438,146 @@ void eliminarDatosDuplicados(listaVentas *lista) {
     free(ids_vistos);
 }
 
+/*****Nombre***************************************
+ * Función totalVentas
+ *****Descripción**********************************
+ * Calcula el total de ventas sumando el importe de cada venta.
+ *****Retorno**************************************
+ * @return: El total de ventas.
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` 
+ *                que contiene las ventas a procesar.
+ **************************************************/
+float totalVentas(listaVentas *lista) {
+    // Verificar que la lista no sea nula
+    if (lista == NULL) {
+        printf("Error: La lista de ventas no está inicializada.\n");
+        return 0.0f;
+    }
 
+    float total = 0.0f;
 
+    // Iterar sobre las ventas para calcular el total
+    for (size_t i = 0; i < lista->size; i++) {
+        if (lista->ventas[i].total != 0.0f) {
+            // Si el total de la venta ya está calculado, usarlo
+            total += lista->ventas[i].total;
+        } else {
+            // Calcular el total a partir de la cantidad y el precio unitario
+            total += lista->ventas[i].cantidad * lista->ventas[i].precio_unitario;
+        }
+    }
 
+    return total;
+}
+
+/*****Nombre***************************************
+ * Función totalVentasMensuales
+ *****Descripción**********************************
+ * Calcula el total de ventas mensuales a partir de la lista de ventas.
+ *****Retorno**************************************
+ * 
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` que contiene las ventas a procesar.
+ * @param meses_totales: Un puntero a un array de cadenas de texto para almacenar los nombres de los meses.
+ * @param totales_mensuales: Un puntero a un array de flotantes para almacenar los totales de ventas por mes.
+ * @param num_meses: Un puntero a un entero que contendrá la cantidad de meses únicos encontrados.
+ **************************************************/
+void totalVentasMensuales(listaVentas *lista, char ***meses_totales, float **totales_mensuales, size_t *num_meses) {
+    if (lista == NULL) {
+        printf("Error: la lista de ventas no está inicializada.\n");
+        return;
+    }
+
+    *meses_totales = NULL;
+    *totales_mensuales = NULL;
+    *num_meses = 0;
+
+    for (size_t i = 0; i < lista->size; i++) {
+        // Obtener el mes y año de la fecha en formato "YYYY-MM"
+        char *fecha = lista->ventas[i].fecha;
+        char *mes = strndup(fecha, 7);         
+
+        // Verificar si el mes ya está en la lista de meses_totales
+        int mes_existente = -1;
+        for (size_t j = 0; j < *num_meses; j++) {
+            if (strcmp((*meses_totales)[j], mes) == 0) {
+                mes_existente = j;
+                break;
+            }
+        }
+
+        // Si el mes no está en la lista, agregarlo
+        if (mes_existente == -1) {
+            *meses_totales = (char **)realloc(*meses_totales, (*num_meses + 1) * sizeof(char *));
+            (*meses_totales)[*num_meses] = mes;
+
+            *totales_mensuales = (float *)realloc(*totales_mensuales, (*num_meses + 1) * sizeof(float));
+            (*totales_mensuales)[*num_meses] = 0.0f;
+
+            mes_existente = (*num_meses)++;
+        } else {
+            free(mes);
+        }
+
+        float total = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
+        (*totales_mensuales)[mes_existente] += total;
+    }
+}
+
+/*****Nombre***************************************
+ * Función totalVentasAnuales
+ *****Descripción**********************************
+ * Calcula el total de ventas anuales a partir de la lista de ventas.
+ *****Retorno**************************************
+ * 
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` que contiene las ventas a procesar.
+ * @param años_totales: Un puntero a un array de cadenas de texto para almacenar los años.
+ * @param totales_anuales: Un puntero a un array de flotantes para almacenar los totales de ventas por año.
+ * @param num_años: Un puntero a un entero que contendrá la cantidad de años únicos encontrados.
+ **************************************************/
+void totalVentasAnuales(listaVentas *lista, char ***años_totales, float **totales_anuales, size_t *num_años) {
+    if (lista == NULL) {
+        printf("Error: La lista de ventas no está inicializada.\n");
+        return;
+    }
+
+    *años_totales = NULL;
+    *totales_anuales = NULL;
+    *num_años = 0;
+
+    for (size_t i = 0; i < lista->size; i++) {
+        // Obtener el año de la fecha en formato "YYYY"
+        char *fecha = lista->ventas[i].fecha;
+        char *año = strndup(fecha, 4); 
+
+        // Verificar si el año ya está en la lista de años_totales
+        int año_existente = -1;
+        for (size_t j = 0; j < *num_años; j++) {
+            if (strcmp((*años_totales)[j], año) == 0) {
+                año_existente = j;
+                break;
+            }
+        }
+
+        // Si el año no está en la lista, agregarlo
+        if (año_existente == -1) {
+            *años_totales = (char **)realloc(*años_totales, (*num_años + 1) * sizeof(char *));
+            (*años_totales)[*num_años] = año;
+
+            *totales_anuales = (float *)realloc(*totales_anuales, (*num_años + 1) * sizeof(float));
+            (*totales_anuales)[*num_años] = 0.0f;
+
+            año_existente = (*num_años)++;
+        } else {
+            free(año); 
+        }
+
+        float total = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
+        (*totales_anuales)[año_existente] += total;
+    }
+}
 
 
 
