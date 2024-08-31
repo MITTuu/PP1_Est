@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "ventas.h"
 
 void mostrar_menu() {
     printf(" _____________________________________________________________ \n");
@@ -17,22 +18,39 @@ void mostrar_menu() {
     printf("  Seleccione una opción: ");
 }
 
-int main() {
+void leerRutaArchivo(char *ruta, size_t longitud) {
+    printf("Ingrese la ruta del archivo JSON: ");
+    fgets(ruta, longitud, stdin);
+    printf("\n");
+    
+    // Eliminar el salto de línea al final de la entrada
+    size_t len = strlen(ruta);
+    if (len > 0 && ruta[len - 1] == '\n') {
+        ruta[len - 1] = '\0';
+    }
+}
 
+int main() {
+    // Configurar la consola para UTF-8
     #ifdef _WIN32
     system("chcp 65001 > nul");
     #endif
 
+    listaVentas *lista = crearListaVentas();
     char opcion;
+    char ruta_archivo[256];
 
     do {
         mostrar_menu();
         scanf(" %c", &opcion);
+        // Limpiar el buffer de entrada
+        while (getchar() != '\n');
 
-        switch (opcion)
-        {
+        switch (opcion) {
         case '1':
-            printf("Opción 1\n");
+            // Leer la ruta del archivo JSON desde la consola
+            leerRutaArchivo(ruta_archivo, sizeof(ruta_archivo));
+            importarDatos(lista, ruta_archivo);
             break;
 
         case '2':
@@ -59,7 +77,8 @@ int main() {
             printf("Opción inválida.\n");
         }
 
-    } while(opcion != '6');
+    } while (opcion != '6');
 
+    liberarListaVentas(lista);
     return 0;
 }

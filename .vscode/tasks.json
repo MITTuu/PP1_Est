@@ -6,8 +6,9 @@
             "command": "C:\\TDM-GCC-64\\bin\\gcc.exe",
             "args": [
                 "-fdiagnostics-color=always",
-                "-g",
+                "-g", 
                 "${file}",
+                "${fileDirname}\\libs\\cJSON.c", 
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
