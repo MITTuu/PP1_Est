@@ -57,9 +57,18 @@ void leerRutaArchivo(char *path, size_t longitud) {
 }
 
 void manejarImportacion(listaVentas *lista) {
-    char path[256];
-    leerRutaArchivo(path, sizeof(path));
+    // Solicitar tamaño del buffer al usuario para ajustar la memoria dinámica
+    size_t longitud = 256;
+    char *path = (char *)malloc(longitud * sizeof(char));
+    if (path == NULL) {
+        fprintf(stderr, "Error al asignar memoria.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    leerRutaArchivo(path, longitud);
     importarDatos(lista, path);
+    
+    free(path);
 }
 
 void manejarProcesamiento(listaVentas *lista) {
@@ -87,10 +96,10 @@ void manejarAnalisis(listaVentas *lista) {
                 size_t num_meses;
 
                 totalVentasMensuales(lista, &meses_totales, &totales_mensuales, &num_meses);
-		for (size_t i = 0; i < num_meses; i++) {
-		    printf("%2zu) %-30s - Total: %.2f\n", i + 1, meses_totales[i], totales_mensuales[i]);
-		    free(meses_totales[i]);
-		}
+                for (size_t i = 0; i < num_meses; i++) {
+                    printf("%2zu) %-30s - Total: %.2f\n", i + 1, meses_totales[i], totales_mensuales[i]);
+                    free(meses_totales[i]);
+                }
                 free(meses_totales);
                 free(totales_mensuales);
                 break;
@@ -163,6 +172,11 @@ void manejarAnalisisTemporal(listaVentas *lista) {
 void manejarMenuPrincipal() {
     listaVentas *lista = crearListaVentas();
     char opcion;
+    char *datos_previos = leerArchivo("ventas_procesadas.json");
+    if (datos_previos != NULL) {
+        importarDatos(lista, "ventas_procesadas.json");
+        free(datos_previos);
+    }
 
     do {
         mostrarMenu();
@@ -188,10 +202,11 @@ void manejarMenuPrincipal() {
                 break;
 
             case '5':
-                printf("Opción 5\n");
+                obtenerTopCategorias(lista);
                 break;
 
             case '6':
+                guardarDatosProcesados(lista, "ventas_procesadas.json");
                 printf("Saliendo del programa...\n");
                 break;
 

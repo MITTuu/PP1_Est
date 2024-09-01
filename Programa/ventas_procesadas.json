@@ -1,0 +1,244 @@
+[{
+    "venta_id":	2,
+    "fecha":	"2021-01-20",
+    "producto_id":	102,
+    "producto_nombre":	"Producto B",
+    "categoria":	"Categoría 2",
+    "cantidad":	5,
+    "precio_unitario":	25,
+    "total":	125
+}, {
+    "venta_id":	5,
+    "fecha":	"2021-03-01",
+    "producto_id":	105,
+    "producto_nombre":	"Producto E",
+    "categoria":	"Categoría 2",
+    "cantidad":	6,
+    "precio_unitario":	20,
+    "total":	0
+}, {
+    "venta_id":	6,
+    "fecha":	"2022-03-15",
+    "producto_id":	106,
+    "producto_nombre":	"Producto F",
+    "categoria":	"Categoría 1",
+    "cantidad":	7,
+    "precio_unitario":	28.782608032226562,
+    "total":	157.5
+}, {
+    "venta_id":	7,
+    "fecha":	"2022-07-05",
+    "producto_id":	107,
+    "producto_nombre":	"Producto G",
+    "categoria":	"Categoría 3",
+    "cantidad":	5,
+    "precio_unitario":	40,
+    "total":	160
+}, {
+    "venta_id":	8,
+    "fecha":	"2022-08-10",
+    "producto_id":	108,
+    "producto_nombre":	"Producto H",
+    "categoria":	"Categoría 2",
+    "cantidad":	9,
+    "precio_unitario":	18,
+    "total":	162
+}, {
+    "venta_id":	9,
+    "fecha":	"2022-09-25",
+    "producto_id":	109,
+    "producto_nombre":	"Producto I",
+    "categoria":	"Categoría 3",
+    "cantidad":	3,
+    "precio_unitario":	28.782608032226562,
+    "total":	150
+}, {
+    "venta_id":	10,
+    "fecha":	"2022-09-05",
+    "producto_id":	110,
+    "producto_nombre":	"Producto J",
+    "categoria":	"Categoría 2",
+    "cantidad":	5,
+    "precio_unitario":	21,
+    "total":	210
+}, {
+    "venta_id":	11,
+    "fecha":	"2023-01-10",
+    "producto_id":	111,
+    "producto_nombre":	"Producto K",
+    "categoria":	"Categoría 1",
+    "cantidad":	12,
+    "precio_unitario":	13,
+    "total":	156
+}, {
+    "venta_id":	12,
+    "fecha":	"2023-02-20",
+    "producto_id":	112,
+    "producto_nombre":	"Producto L",
+    "categoria":	"Categoría 2",
+    "cantidad":	10,
+    "precio_unitario":	22,
+    "total":	220
+}, {
+    "venta_id":	13,
+    "fecha":	"2023-03-15",
+    "producto_id":	113,
+    "producto_nombre":	"Producto M",
+    "categoria":	"Categoría 3",
+    "cantidad":	8,
+    "precio_unitario":	18,
+    "total":	144
+}, {
+    "venta_id":	14,
+    "fecha":	"2023-04-05",
+    "producto_id":	114,
+    "producto_nombre":	"Producto N",
+    "categoria":	"Categoría 1",
+    "cantidad":	9,
+    "precio_unitario":	25,
+    "total":	225
+}, {
+    "venta_id":	15,
+    "fecha":	"2023-05-10",
+    "producto_id":	115,
+    "producto_nombre":	"Producto O",
+    "categoria":	"Categoría 2",
+    "cantidad":	7,
+    "precio_unitario":	30,
+    "total":	210
+}, {
+    "venta_id":	16,
+    "fecha":	"2023-06-20",
+    "producto_id":	116,
+    "producto_nombre":	"Producto P",
+    "categoria":	"Categoría 3",
+    "cantidad":	5,
+    "precio_unitario":	40,
+    "total":	200
+}, {
+    "venta_id":	17,
+    "fecha":	"2023-07-05",
+    "producto_id":	117,
+    "producto_nombre":	"Producto Q",
+    "categoria":	"Categoría 1",
+    "cantidad":	6,
+    "precio_unitario":	35,
+    "total":	210
+}, {
+    "venta_id":	18,
+    "fecha":	"2023-08-15",
+    "producto_id":	118,
+    "producto_nombre":	"Producto R",
+    "categoria":	"Categoría 2",
+    "cantidad":	8,
+    "precio_unitario":	28,
+    "total":	224
+}, {
+    "venta_id":	19,
+    "fecha":	"2023-09-10",
+    "producto_id":	119,
+    "producto_nombre":	"Producto S",
+    "categoria":	"Categoría 3",
+    "cantidad":	10,
+    "precio_unitario":	50,
+    "total":	500
+}, {
+    "venta_id":	20,
+    "fecha":	"2023-10-05",
+    "producto_id":	120,
+    "producto_nombre":	"Producto T",
+    "categoria":	"Categoría 1",
+    "cantidad":	15,
+    "precio_unitario":	20,
+    "total":	300
+}, {
+    "venta_id":	21,
+    "fecha":	"2023-11-10",
+    "producto_id":	121,
+    "producto_nombre":	"Producto U",
+    "categoria":	"Categoría 2",
+    "cantidad":	5,
+    "precio_unitario":	55,
+    "total":	275
+}, {
+    "venta_id":	22,
+    "fecha":	"2023-12-01",
+    "producto_id":	122,
+    "producto_nombre":	"Producto V",
+    "categoria":	"Categoría 3",
+    "cantidad":	12,
+    "precio_unitario":	45,
+    "total":	540
+}, {
+    "venta_id":	23,
+    "fecha":	"2023-12-15",
+    "producto_id":	123,
+    "producto_nombre":	"Producto W",
+    "categoria":	"Categoría 1",
+    "cantidad":	20,
+    "precio_unitario":	30,
+    "total":	600
+}, {
+    "venta_id":	24,
+    "fecha":	"2023-12-20",
+    "producto_id":	124,
+    "producto_nombre":	"Producto X",
+    "categoria":	"Categoría 2",
+    "cantidad":	14,
+    "precio_unitario":	25,
+    "total":	350
+}, {
+    "venta_id":	25,
+    "fecha":	"2023-12-30",
+    "producto_id":	125,
+    "producto_nombre":	"Producto Y",
+    "categoria":	"Categoría 3",
+    "cantidad":	18,
+    "precio_unitario":	22,
+    "total":	396
+}, {
+    "venta_id":	26,
+    "fecha":	"2024-05-10",
+    "producto_id":	117,
+    "producto_nombre":	"Producto Q",
+    "categoria":	"Categoría 2",
+    "cantidad":	9,
+    "precio_unitario":	19,
+    "total":	0
+}, {
+    "venta_id":	27,
+    "fecha":	"2024-05-25",
+    "producto_id":	118,
+    "producto_nombre":	"Producto R",
+    "categoria":	"Categoría 1",
+    "cantidad":	14,
+    "precio_unitario":	16,
+    "total":	224
+}, {
+    "venta_id":	28,
+    "fecha":	"2024-07-05",
+    "producto_id":	119,
+    "producto_nombre":	"Producto S",
+    "categoria":	"Categoría 3",
+    "cantidad":	4,
+    "precio_unitario":	45,
+    "total":	180
+}, {
+    "venta_id":	29,
+    "fecha":	"2024-07-20",
+    "producto_id":	120,
+    "producto_nombre":	"Producto T",
+    "categoria":	"Categoría 2",
+    "cantidad":	11,
+    "precio_unitario":	28.782608032226562,
+    "total":	0
+}, {
+    "venta_id":	30,
+    "fecha":	"2024-08-20",
+    "producto_id":	120,
+    "producto_nombre":	"Producto T",
+    "categoria":	"Categoría 2",
+    "cantidad":	11,
+    "precio_unitario":	28.782608032226562,
+    "total":	0
+}]

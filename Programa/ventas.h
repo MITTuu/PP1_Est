@@ -7,11 +7,12 @@
  * Proyecto: Sistema de Análisis de Datos de Ventas
  * Autor: Dylan Montiel Zúñiga
  *****Descripción**********************************
- *
+ * Este archivo de encabezado contiene la declaración de estructuras,
+ * funcione necesarias para la gestión y manipulación
+ * de datos relacionados con las ventas en el sistema de análisis.
  *****Versión**************************************
- * 3.0 | 08/30/2024 | Dylan Montiel Zúñiga
+ * 3.0 | 08/01/2024 | Dylan Montiel Zúñiga
  **************************************************/
-
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -61,6 +62,19 @@ typedef struct {
     size_t size;
     size_t capacity;
 } listaVentas;
+
+/*****Nombre****************************************
+ * struct CategoriaVenta
+ *****Descripción***********************************
+ * Representa una lista dinámica de ventas por categoria
+ *****Campos****************************************
+ * @categoria: Categoria de productos vendidos.
+ * @totalVentas: Total de ventas.
+ ***************************************************/
+typedef struct {
+    char *categoria;
+    float totalVentas;
+} CategoriaVenta;
 
 /*****Nombre***************************************
  * Función crearListaVentas
@@ -135,7 +149,6 @@ void agregarVenta(listaVentas *lista, Venta nuevaVenta) {
     lista->size++;
 }
 
-
 /*****Nombre***************************************
  * Función liberarListaVentas
  *****Descripción**********************************
@@ -156,7 +169,19 @@ void liberarListaVentas(listaVentas *lista) {
     }
 }
 
-// Función para construir el mensaje de error sobre atributos faltantes
+/*****Nombre***************************************
+ * Función reportarAtributosFaltantes
+ *****Descripción**********************************
+ * Esta función verifica la presencia de los atributos necesarios en un
+ * objeto JSON representado por `cJSON`. 
+ *****Retorno**************************************
+ * No retorna ningún valor.
+ *****Entradas************************************** 
+ * @param item: Un puntero a un objeto `cJSON` que representa el dato
+ *              que se está verificando.
+ * @param linea: Número de la línea en el archivo desde donde se importó
+ *               el dato, que se incluye en el mensaje de error.
+ **************************************************/
 void reportarAtributosFaltantes(cJSON *item, int linea) {
     const char *atributos[] = { "venta_id", "fecha", "producto_id", "producto_nombre", "categoria" };
     const char *nombre_atributos[] = { "Identificador de venta", "Fecha", "Identificador de producto", "Nombre de producto", "Categoría" };
@@ -175,14 +200,12 @@ void reportarAtributosFaltantes(cJSON *item, int linea) {
     }
 
     if (faltan == 0) {
-        // Si no faltan atributos (esto no debería pasar con esta función), eliminar el mensaje
         mensaje[0] = '\0';
     } else {
         strncat(mensaje, ".", sizeof(mensaje) - strlen(mensaje));
         printf("%s\n", mensaje);
     }
 }
-
 
 /*****Nombre***************************************
  * Función importarDatos
@@ -248,6 +271,60 @@ void importarDatos(listaVentas *lista, const char *path) {
     free(contenido_json);
 
     printf("\nDatos importados correctamente.\n");
+}
+
+/*****Nombre***************************************
+ * Función guardarDatosProcesados
+ *****Descripción**********************************
+ * Guarda los datos de ventas procesados en un 
+ * archivo JSON.
+ *****Retorno**************************************
+ *
+ ****Entradas************************************** 
+ * @param lista: Un puntero a una estructura listaVentas que 
+ *               contiene los datos de ventas a ser guardados.
+ * @param path: Ruta del archivo JSON donde se deben guardar
+ *              los datos.
+ **************************************************/
+void guardarDatosProcesados(listaVentas *lista, const char *path) {
+    cJSON *jsonExistente = cJSON_CreateArray();
+
+    // Añadir los datos de ventas procesados
+    for (size_t i = 0; i < lista->size; i++) {
+        cJSON *ventaJSON = cJSON_CreateObject();
+        cJSON_AddNumberToObject(ventaJSON, "venta_id", lista->ventas[i].venta_id);
+        cJSON_AddStringToObject(ventaJSON, "fecha", lista->ventas[i].fecha);
+        cJSON_AddNumberToObject(ventaJSON, "producto_id", lista->ventas[i].producto_id);
+        cJSON_AddStringToObject(ventaJSON, "producto_nombre", lista->ventas[i].producto_nombre);
+        cJSON_AddStringToObject(ventaJSON, "categoria", lista->ventas[i].categoria);
+        cJSON_AddNumberToObject(ventaJSON, "cantidad", lista->ventas[i].cantidad);
+        cJSON_AddNumberToObject(ventaJSON, "precio_unitario", lista->ventas[i].precio_unitario);
+        cJSON_AddNumberToObject(ventaJSON, "total", lista->ventas[i].total);
+
+        cJSON_AddItemToArray(jsonExistente, ventaJSON);
+    }
+
+    // Convertir el JSON modificado a una cadena
+    char *jsonString = cJSON_Print(jsonExistente);
+    if (jsonString == NULL) {
+        // Manejo de errores: fallo al convertir a cadena
+        fprintf(stderr, "Error al convertir JSON a cadena.\n");
+        cJSON_Delete(jsonExistente);
+        return;
+    }
+
+    // Guardar en el archivo (sobrescribir el contenido anterior)
+    FILE *archivo = fopen(path, "w");
+    if (archivo != NULL) {
+        fputs(jsonString, archivo);
+        fclose(archivo);
+    } else {
+        fprintf(stderr, "Error al abrir el archivo para escritura.\n");
+    }
+
+    // Liberar memoria
+    free(jsonString);
+    cJSON_Delete(jsonExistente);
 }
 
 /*****Nombre***************************************
@@ -752,6 +829,74 @@ float tasaCrecimientoTrimestral(listaVentas *lista, int trimestre, int anio) {
 
     printf("Tasa de crecimiento para el trimestre %d del año %d: %.2f%%\n", trimestre, anio, tasa_crecimiento);
     return tasa_crecimiento;
+}
+
+/*****Nombre***************************************
+ * Función obtenerTopCategorias
+ *****Descripción**********************************
+ * Calcula las ventas totales por categoría y muestra 
+ * el top 5 de categorías con mayores ventas.
+ *****Retorno**************************************
+ * No retorna valor. Imprime el top 5 de categorías en consola.
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` que contiene las ventas a procesar.
+ **************************************************/
+void obtenerTopCategorias(listaVentas *lista) {
+    if (lista == NULL || lista->size == 0) {
+        printf("No hay datos de ventas disponibles.\n");
+        return;
+    }
+
+    // struct para almacenar las ventas totales por categoría
+    CategoriaVenta *categorias = NULL;
+    size_t numCategorias = 0;
+
+    // Calcular ventas totales por categoria
+    for (size_t i = 0; i < lista->size; i++) {
+        char *categoriaActual = lista->ventas[i].categoria;
+        float totalVenta = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
+
+        int categoriaExistente = -1;
+        for (size_t j = 0; j < numCategorias; j++) {
+            if (strcmp(categorias[j].categoria, categoriaActual) == 0) {
+                categoriaExistente = j;
+                break;
+            }
+        }
+
+        // Si la categoria no existe, agregarla
+        if (categoriaExistente == -1) {
+            categorias = (CategoriaVenta *)realloc(categorias, (numCategorias + 1) * sizeof(CategoriaVenta));
+            categorias[numCategorias].categoria = strdup(categoriaActual);
+            categorias[numCategorias].totalVentas = totalVenta;
+            numCategorias++; 
+        } else {
+            categorias[categoriaExistente].totalVentas += totalVenta;
+        }
+    }
+
+    // Aplicar Bubble sort descendente
+    for (size_t i = 0; i < numCategorias - 1; i++) {
+        for (size_t j = i; j < numCategorias; j++) {
+            if (categorias[i].totalVentas < categorias[j].totalVentas) {
+                CategoriaVenta temp = categorias[i];
+                categorias[i] = categorias[j];
+                categorias[j] = temp;  
+            }
+        }
+    }
+
+    // Mostrar el Top 5 de categorías con mayores ventas
+    printf("Top 5 de categorías con mayores ventas:\n");
+    for (size_t i = 0; i < (numCategorias < 5 ? numCategorias : 5); i++) {
+        printf("%zu) %-30s - Total Ventas: %.2f\n", i + 1, categorias[i].categoria, categorias[i].totalVentas);
+    }
+
+    // Liberar memoria
+    for (size_t i = 0; i < numCategorias; i++) {
+        free(categorias[i].categoria);
+    }
+    free(categorias);
 }
 
 #endif //VENTAS_H

@@ -2,7 +2,7 @@
 #define FUNCS_JSON_H
 
 /*****Datos administrativos************************
- * Nombre del archivo: ventas
+ * Nombre del archivo: funcs json
  * Tipo de archivo: C Encabezado
  * Proyecto: Sistema de Análisis de Datos de Ventas
  * Autor: Dylan Montiel Zúñiga
@@ -13,11 +13,11 @@
  * su contenido, facilitando la integración de datos en el sistema 
  * de análisis de ventas.
  *****Versión**************************************
- * 3.0 | 08/30/2024 | Dylan Montiel Zúñiga
+ * 1.0 | 08/30/2024 | Dylan Montiel Zúñiga
  **************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-//#include "libs/cJSON.h"
+#include <cjson/cJSON.h>
 
 /*****Nombre***************************************
  * Función leerArchivo
