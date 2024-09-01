@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "funcs_json.h"
 
 /*****Nombre****************************************
@@ -488,19 +489,36 @@ void totalVentasMensuales(listaVentas *lista, char ***meses_totales, float **tot
         return;
     }
 
+    const char *nombres_meses[] = {
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    };
+
     *meses_totales = NULL;
     *totales_mensuales = NULL;
     *num_meses = 0;
 
     for (size_t i = 0; i < lista->size; i++) {
-        // Obtener el mes y año de la fecha en formato "YYYY-MM"
         char *fecha = lista->ventas[i].fecha;
-        char *mes = strndup(fecha, 7);         
+        
+        // Extraer el año y el mes de la fecha en formato "YYYY-MM-DD"
+        char anio[5];
+        char mes_numero[3];
+        strncpy(anio, fecha, 4);
+        anio[4] = '\0';
+        strncpy(mes_numero, fecha + 5, 2);
+        mes_numero[2] = '\0';
+
+        int mes_index = atoi(mes_numero) - 1; 
+
+        // Construir la cadena con el nombre del mes y el año ("Mes YYYY")
+        char mes_nombre[20];
+        snprintf(mes_nombre, sizeof(mes_nombre), "%s %s", nombres_meses[mes_index], anio);
 
         // Verificar si el mes ya está en la lista de meses_totales
         int mes_existente = -1;
         for (size_t j = 0; j < *num_meses; j++) {
-            if (strcmp((*meses_totales)[j], mes) == 0) {
+            if (strcmp((*meses_totales)[j], mes_nombre) == 0) {
                 mes_existente = j;
                 break;
             }
@@ -509,20 +527,19 @@ void totalVentasMensuales(listaVentas *lista, char ***meses_totales, float **tot
         // Si el mes no está en la lista, agregarlo
         if (mes_existente == -1) {
             *meses_totales = (char **)realloc(*meses_totales, (*num_meses + 1) * sizeof(char *));
-            (*meses_totales)[*num_meses] = mes;
+            (*meses_totales)[*num_meses] = strdup(mes_nombre);
 
             *totales_mensuales = (float *)realloc(*totales_mensuales, (*num_meses + 1) * sizeof(float));
             (*totales_mensuales)[*num_meses] = 0.0f;
 
             mes_existente = (*num_meses)++;
-        } else {
-            free(mes);
         }
 
         float total = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
         (*totales_mensuales)[mes_existente] += total;
     }
 }
+
 
 /*****Nombre***************************************
  * Función totalVentasAnuales
@@ -576,6 +593,165 @@ void totalVentasAnuales(listaVentas *lista, char ***años_totales, float **total
         float total = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
         (*totales_anuales)[año_existente] += total;
     }
+}
+
+/*****Nombre***************************************
+ * Función mesConMayorVenta
+ *****Descripción**********************************
+ * Determina el mes con el mayor total de ventas a 
+ * partir de la lista de ventas.
+ *****Retorno**************************************
+ * Retorna una cadena de texto que representa el mes con 
+ * el mayor total de ventas.
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` 
+ * que contiene las ventas a procesar.
+ **************************************************/
+char* mesConMayorVenta(listaVentas *lista) {
+    char **meses_totales = NULL;
+    float *totales_mensuales = NULL;
+    size_t num_meses = 0;
+    totalVentasMensuales(lista, &meses_totales, &totales_mensuales, &num_meses);
+
+    if (num_meses == 0) {
+        return "No se encontraron ventas registradas.";
+    }
+
+    // Encontrar el mes con mayor venta
+    int i_mayorVenta = 0;
+    for (size_t i = 1; i < num_meses; i++) {
+        if (totales_mensuales[i] > totales_mensuales[i_mayorVenta]) {
+            i_mayorVenta = i;
+        }
+    }
+
+    // Formatear el resultado
+    static char resultado[50];
+    snprintf(resultado, sizeof(resultado), "%s - Total: %.2f", meses_totales[i_mayorVenta], totales_mensuales[i_mayorVenta]);
+
+    // Liberar memoria
+    for (size_t i = 0; i < num_meses; i++) {
+        free(meses_totales[i]);
+    }
+    free(meses_totales);
+    free(totales_mensuales);
+
+    return resultado;
+}
+
+/*****Nombre***************************************
+ * Función diaMasActivo
+ *****Descripción**********************************
+ * Determina el día de la semana más activo (con más 
+ * transacciones) a partir de la lista de ventas.
+ *****Retorno**************************************
+ * Retorna una cadena de texto que representa el día 
+ * de la semana con más transacciones.
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` 
+ *               que contiene las ventas a procesar.
+ **************************************************/
+char* diaMasActivo(listaVentas *lista) {
+    if (lista == NULL) {
+        return "Error: la lista de ventas no está inicializada.";
+    }
+
+    const char *nombres_dias[] = {
+        "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"
+    };
+    int transacciones_dias[7] = {0}; 
+
+    for (size_t i = 0; i < lista->size; i++) {
+        char *fecha = lista->ventas[i].fecha;
+
+        // Extraer año, mes y día
+        struct tm tiempo = {0};
+        sscanf(fecha, "%4d-%2d-%2d", &tiempo.tm_year, &tiempo.tm_mon, &tiempo.tm_mday);
+        tiempo.tm_year -= 1900; // Ajuste para el tipo tm
+        tiempo.tm_mon -= 1;     // Ajuste del rango de meses (0-11)
+
+        // Determinar el día de la semana
+        mktime(&tiempo); 
+        int dia_semana = tiempo.tm_wday; // 'tm_wday' es el día de la semana (0=domingo, 6=sábado)
+
+        transacciones_dias[dia_semana]++;
+    }
+
+    // Encontrar el día de la semana con más transacciones
+    int dia_mas_activo = 0;
+    for (int i = 1; i < 7; i++) {
+        if (transacciones_dias[i] > transacciones_dias[dia_mas_activo]) {
+            dia_mas_activo = i;
+        }
+    }
+
+    // Formatear el resultado
+    static char resultado[50];
+    snprintf(resultado, sizeof(resultado), "%s - Total de transacciones: %d", nombres_dias[dia_mas_activo], transacciones_dias[dia_mas_activo]);
+
+    return resultado;
+}
+
+/*****Nombre***************************************
+ * Función tasaCrecimientoTrimestral
+ *****Descripción**********************************
+ * Calcula la tasa de crecimiento o decrecimiento de las 
+ * ventas en un trimestre específico en comparación con 
+ * el trimestre anterior.
+ *****Retorno**************************************
+ * Retorna la tasa de crecimiento o decrecimiento en porcentaje.
+ ****Entradas************************************** 
+ * @param lista: Un puntero al struct `listaVentas` que contiene las ventas a procesar.
+ * @param trimestre: Un entero que representa el trimestre a analizar (1, 2, 3 o 4).
+ * @param anio: Un entero que representa el año del trimestre a analizar.
+ **************************************************/
+float tasaCrecimientoTrimestral(listaVentas *lista, int trimestre, int anio) {
+    if (lista == NULL) {
+        printf("Error: La lista de ventas no está inicializada.\n");
+        return 0.0f;
+    }
+
+    float total_actual = 0.0f;
+    float total_anterior = 0.0f;
+
+    // Definir el rango de meses para el trimestre actual y anterior
+    int mes_inicio_actual = (trimestre - 1) * 3 + 1; // Mes de inicio del trimestre actual
+    int mes_fin_actual = trimestre * 3;              // Mes de fin del trimestre actual
+    int mes_inicio_anterior = mes_inicio_actual - 3; // Mes de inicio del trimestre anterior
+
+    // Calcular totales del trimestre actual y anterior
+    for (size_t i = 0; i < lista->size; i++) {
+        // Extraer el año y el mes de la fecha
+        char *fecha = lista->ventas[i].fecha;
+        int anio_venta, mes_venta;
+        sscanf(fecha, "%d-%d", &anio_venta, &mes_venta);
+
+        float total = (lista->ventas[i].total != 0.0f) ? lista->ventas[i].total : (lista->ventas[i].cantidad * lista->ventas[i].precio_unitario);
+
+        // Acumular total para el trimestre actual
+        if (anio_venta == anio && mes_venta >= mes_inicio_actual && mes_venta <= mes_fin_actual) {
+            total_actual += total;
+        }
+        // Acumular total para el trimestre anterior
+        else if (anio_venta == anio && mes_venta >= mes_inicio_anterior && mes_venta < mes_inicio_actual) {
+            total_anterior += total;
+        }
+        // Si el trimestre anterior cruza años (es el primer trimestre)
+        else if (anio_venta == anio - 1 && trimestre == 1 && mes_venta >= 10 && mes_venta <= 12) {
+            total_anterior += total;
+        }
+    }
+
+    // Calcular la tasa de crecimiento
+    if (total_anterior == 0.0f) {
+        printf("No hay datos suficientes para calcular la tasa de crecimiento.\n");
+        return 0.0f;
+    }
+
+    float tasa_crecimiento = ((total_actual - total_anterior) / total_anterior) * 100.0f;
+
+    printf("Tasa de crecimiento para el trimestre %d del año %d: %.2f%%\n", trimestre, anio, tasa_crecimiento);
+    return tasa_crecimiento;
 }
 
 #endif //VENTAS_H

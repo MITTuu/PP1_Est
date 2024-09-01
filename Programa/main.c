@@ -31,6 +31,19 @@ void mostrarSubmenuAnalisis() {
     printf("  Seleccione una opción: ");
 }
 
+void mostrarSubmenuAnalisisTemporal() {
+    printf(" _____________________________________________________________ \n");
+    printf("|                                                             | \n");
+    printf("|                      Análisis Temporal                      |\n");
+    printf("|_____________________________________________________________|\n\n");
+    printf("    1. Mes con mayor venta\n");
+    printf("    2. Día de la semana más activo\n");
+    printf("    3. Calcular tasa de crecimiento/decrecimiento\n");
+    printf("    4. Volver al menú principal\n");
+    printf(" _____________________________________________________________ \n");
+    printf("  Seleccione una opción: ");
+}
+
 void leerRutaArchivo(char *path, size_t longitud) {
     printf("Ingrese la ruta del archivo JSON: ");
     fgets(path, longitud, stdin);
@@ -74,10 +87,10 @@ void manejarAnalisis(listaVentas *lista) {
                 size_t num_meses;
 
                 totalVentasMensuales(lista, &meses_totales, &totales_mensuales, &num_meses);
-                for (size_t i = 0; i < num_meses; i++) {
-                    printf("Mes: %s - Total: %.2f\n", meses_totales[i], totales_mensuales[i]);
-                    free(meses_totales[i]);
-                }
+		for (size_t i = 0; i < num_meses; i++) {
+		    printf("%2zu) %-30s - Total: %.2f\n", i + 1, meses_totales[i], totales_mensuales[i]);
+		    free(meses_totales[i]);
+		}
                 free(meses_totales);
                 free(totales_mensuales);
                 break;
@@ -89,7 +102,7 @@ void manejarAnalisis(listaVentas *lista) {
 
                 totalVentasAnuales(lista, &años_totales, &totales_anuales, &num_años);
                 for (size_t i = 0; i < num_años; i++) {
-                    printf("Año: %s - Total: %.2f\n", años_totales[i], totales_anuales[i]);
+                    printf("%d) %s  		- Total: %.2f\n", i+1, años_totales[i], totales_anuales[i]);
                     free(años_totales[i]);
                 }
                 free(años_totales);
@@ -105,6 +118,46 @@ void manejarAnalisis(listaVentas *lista) {
                 break;
         }
     } while (subOpcion1 != '4');
+}
+
+void manejarAnalisisTemporal(listaVentas *lista) {
+    char subOpcion;
+    do {
+        mostrarSubmenuAnalisisTemporal();
+        scanf(" %c", &subOpcion);
+        printf("\n");
+        while (getchar() != '\n');
+
+        switch (subOpcion) {
+            case '1': {
+                char *mes_mayor_venta = mesConMayorVenta(lista);
+                printf("Mes con mayor venta: %s\n", mes_mayor_venta);
+                break;
+            }
+            case '2': {
+                char *dia_mas_activo = diaMasActivo(lista);
+                printf("Día de la semana más activo: %s\n", dia_mas_activo);
+                break;
+            }
+            case '3': {
+                int trimestre, anio;
+                printf("Ingrese el trimestre (1-4): ");
+                scanf("%d", &trimestre);
+                printf("Ingrese el año: ");
+                scanf("%d", &anio);
+                float tasa = tasaCrecimientoTrimestral(lista, trimestre, anio);
+                printf("Tasa de crecimiento/decrecimiento: %.2f%%\n", tasa);
+                break;
+            }
+            case '4':
+                printf("Volviendo al menú principal...\n");
+                break;
+
+            default:
+                printf("Opción inválida. Por favor, intente nuevamente.\n");
+                break;
+        }
+    } while (subOpcion != '4');
 }
 
 void manejarMenuPrincipal() {
@@ -131,7 +184,7 @@ void manejarMenuPrincipal() {
                 break;
 
             case '4':
-                printf("Opción 4\n");
+                manejarAnalisisTemporal(lista);
                 break;
 
             case '5':
