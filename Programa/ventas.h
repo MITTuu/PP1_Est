@@ -7,12 +7,11 @@
  * Proyecto: Sistema de Análisis de Datos de Ventas
  * Autor: Dylan Montiel Zúñiga
  *****Descripción**********************************
- * Este archivo de encabezado contiene la declaración de estructuras,
- * funcione necesarias para la gestión y manipulación
- * de datos relacionados con las ventas en el sistema de análisis.
+ *
  *****Versión**************************************
- * 3.0 | 08/01/2024 | Dylan Montiel Zúñiga
+ * 4.0 | 08/31/2024 | Dylan Montiel Zúñiga
  **************************************************/
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -149,6 +148,7 @@ void agregarVenta(listaVentas *lista, Venta nuevaVenta) {
     lista->size++;
 }
 
+
 /*****Nombre***************************************
  * Función liberarListaVentas
  *****Descripción**********************************
@@ -169,19 +169,7 @@ void liberarListaVentas(listaVentas *lista) {
     }
 }
 
-/*****Nombre***************************************
- * Función reportarAtributosFaltantes
- *****Descripción**********************************
- * Esta función verifica la presencia de los atributos necesarios en un
- * objeto JSON representado por `cJSON`. 
- *****Retorno**************************************
- * No retorna ningún valor.
- *****Entradas************************************** 
- * @param item: Un puntero a un objeto `cJSON` que representa el dato
- *              que se está verificando.
- * @param linea: Número de la línea en el archivo desde donde se importó
- *               el dato, que se incluye en el mensaje de error.
- **************************************************/
+// Función para construir el mensaje de error sobre atributos faltantes
 void reportarAtributosFaltantes(cJSON *item, int linea) {
     const char *atributos[] = { "venta_id", "fecha", "producto_id", "producto_nombre", "categoria" };
     const char *nombre_atributos[] = { "Identificador de venta", "Fecha", "Identificador de producto", "Nombre de producto", "Categoría" };
@@ -200,12 +188,14 @@ void reportarAtributosFaltantes(cJSON *item, int linea) {
     }
 
     if (faltan == 0) {
+        // Si no faltan atributos (esto no debería pasar con esta función), eliminar el mensaje
         mensaje[0] = '\0';
     } else {
         strncat(mensaje, ".", sizeof(mensaje) - strlen(mensaje));
         printf("%s\n", mensaje);
     }
 }
+
 
 /*****Nombre***************************************
  * Función importarDatos
@@ -229,6 +219,14 @@ void importarDatos(listaVentas *lista, const char *path) {
     char *contenido_json = leerArchivo(path);
     if (contenido_json == NULL) {
         printf("Error al leer el archivo JSON.\n");
+        return;
+    }
+
+    // Verificar si el archivo está vacío
+    if (strlen(contenido_json) == 0) {
+        // El archivo está vacío, no hay nada que importar
+        printf("El archivo JSON está vacío, no hay datos para importar.\n");
+        free(contenido_json);
         return;
     }
 
@@ -319,6 +317,7 @@ void guardarDatosProcesados(listaVentas *lista, const char *path) {
         fputs(jsonString, archivo);
         fclose(archivo);
     } else {
+        // Manejo de errores: fallo al abrir el archivo
         fprintf(stderr, "Error al abrir el archivo para escritura.\n");
     }
 
@@ -744,8 +743,8 @@ char* diaMasActivo(listaVentas *lista) {
         // Extraer año, mes y día
         struct tm tiempo = {0};
         sscanf(fecha, "%4d-%2d-%2d", &tiempo.tm_year, &tiempo.tm_mon, &tiempo.tm_mday);
-        tiempo.tm_year -= 1900; // Ajuste para el tipo tm
-        tiempo.tm_mon -= 1;     // Ajuste del rango de meses (0-11)
+        tiempo.tm_year -= 1900; // Ajustar para el tipo tm
+        tiempo.tm_mon -= 1;     // Ajustar del rango de meses (0-11)
 
         // Determinar el día de la semana
         mktime(&tiempo); 

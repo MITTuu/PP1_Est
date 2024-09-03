@@ -50,7 +50,7 @@
         "fecha": "2022-03-15",
         "producto_id": 106,
         "producto_nombre": "Producto F",
-        "categoria": "Categoría 1",
+        "categoria": "Categoría 4",
         "cantidad": 7,
         "total": 157.5
     },
@@ -59,7 +59,7 @@
         "fecha": "2022-07-05",
         "producto_id": 107,
         "producto_nombre": "Producto G",
-        "categoria": "Categoría 3",
+        "categoria": "Categoría 4",
         "precio_unitario": 40.0,
         "total": 160.0
     },
@@ -68,7 +68,7 @@
         "fecha": "2022-08-10",
         "producto_id": 108,
         "producto_nombre": "Producto H",
-        "categoria": "Categoría 2",
+        "categoria": "Categoría 4",
         "cantidad": 9,
         "precio_unitario": 18.0,
         "total": 162.0
@@ -96,7 +96,7 @@
         "fecha": "2023-01-10",
         "producto_id": 111,
         "producto_nombre": "Producto K",
-        "categoria": "Categoría 1",
+        "categoria": "Categoría 5",
         "cantidad": 12,
         "precio_unitario": 13.0,
         "total": 156.0
@@ -106,7 +106,7 @@
         "fecha": "2023-02-20",
         "producto_id": 112,
         "producto_nombre": "Producto L",
-        "categoria": "Categoría 2",
+        "categoria": "Categoría 5",
         "cantidad": 10,
         "precio_unitario": 22.0,
         "total": 220.0
@@ -116,7 +116,7 @@
         "fecha": "2023-03-15",
         "producto_id": 113,
         "producto_nombre": "Producto M",
-        "categoria": "Categoría 3",
+        "categoria": "Categoría 6",
         "cantidad": 8,
         "precio_unitario": 18.0,
         "total": 144.0
@@ -146,7 +146,7 @@
         "fecha": "2023-06-20",
         "producto_id": 116,
         "producto_nombre": "Producto P",
-        "categoria": "Categoría 3",
+        "categoria": "Categoría 6",
         "cantidad": 5,
         "precio_unitario": 40.0,
         "total": 200.0
@@ -156,7 +156,7 @@
         "fecha": "2023-07-05",
         "producto_id": 117,
         "producto_nombre": "Producto Q",
-        "categoria": "Categoría 1",
+        "categoria": "Categoría 6",
         "cantidad": 6,
         "precio_unitario": 35.0,
         "total": 210.0
@@ -166,7 +166,7 @@
         "fecha": "2023-08-15",
         "producto_id": 118,
         "producto_nombre": "Producto R",
-        "categoria": "Categoría 2",
+        "categoria": "Categoría 7",
         "cantidad": 8,
         "precio_unitario": 28.0,
         "total": 224.0
@@ -184,8 +184,6 @@
     {
         "venta_id": 20,
         "fecha": "2023-10-05",
-        "producto_id": 120,
-        "producto_nombre": "Producto T",
         "categoria": "Categoría 1",
         "cantidad": 15,
         "precio_unitario": 20.0,
@@ -196,7 +194,7 @@
         "fecha": "2023-11-10",
         "producto_id": 121,
         "producto_nombre": "Producto U",
-        "categoria": "Categoría 2",
+        "categoria": "Categoría 8",
         "cantidad": 5,
         "precio_unitario": 55.0,
         "total": 275.0
@@ -206,7 +204,7 @@
         "fecha": "2023-12-01",
         "producto_id": 122,
         "producto_nombre": "Producto V",
-        "categoria": "Categoría 3",
+        "categoria": "Categoría 8",
         "cantidad": 12,
         "precio_unitario": 45.0,
         "total": 540.0
@@ -216,7 +214,7 @@
         "fecha": "2023-12-15",
         "producto_id": 123,
         "producto_nombre": "Producto W",
-        "categoria": "Categoría 1",
+        "categoria": "Categoría 8",
         "cantidad": 20,
         "precio_unitario": 30.0,
         "total": 600.0
@@ -226,7 +224,7 @@
         "fecha": "2023-12-20",
         "producto_id": 124,
         "producto_nombre": "Producto X",
-        "categoria": "Categoría 2",
+        "categoria": "Categoría 8",
         "cantidad": 14,
         "precio_unitario": 25.0,
         "total": 350.0

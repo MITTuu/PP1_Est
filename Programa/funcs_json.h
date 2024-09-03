@@ -13,7 +13,7 @@
  * su contenido, facilitando la integración de datos en el sistema 
  * de análisis de ventas.
  *****Versión**************************************
- * 1.0 | 08/30/2024 | Dylan Montiel Zúñiga
+ * 3.0 | 08/30/2024 | Dylan Montiel Zúñiga
  **************************************************/
 #include <stdio.h>
 #include <stdlib.h>
